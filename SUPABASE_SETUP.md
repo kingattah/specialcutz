@@ -61,9 +61,21 @@ Works appear on the main site portfolio grid. Clicking a service card filters th
 
 To increase limits, adjust Supabase Storage settings in your project dashboard.
 
-## Security notes
+## 6. Deploy on GitHub Pages
 
-- Only signed-in users can upload or delete works.
-- Anyone can view works on the public site (read-only).
-- Keep `admin.html` unlinked from the public nav — bookmark it for yourself.
-- Never commit real API keys to public repos if the repo is shared.
+The site auto-deploys when you push to `main`. Add these **repository secrets** first:
+
+**GitHub repo → Settings → Secrets and variables → Actions → New repository secret**
+
+| Secret name           | Value                                      |
+|-----------------------|--------------------------------------------|
+| `SUPABASE_URL`        | `https://fspoirkopheconjavjop.supabase.co` |
+| `SUPABASE_ANON_KEY`   | Your Supabase anon / publishable key       |
+
+Also enable Pages: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+If a deploy shows **"Deployment cancelled"**, open **Actions**, re-run the latest workflow, and wait for it to finish (a newer push can cancel the previous run).
+
+Live site: `https://kingattah.github.io/specialcutz/`
+Admin panel: `https://kingattah.github.io/specialcutz/admin.html`
+
