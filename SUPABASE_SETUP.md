@@ -63,19 +63,10 @@ To increase limits, adjust Supabase Storage settings in your project dashboard.
 
 ## 6. Deploy on GitHub Pages
 
-The site auto-deploys when you push to `main`. Add these **repository secrets** first:
+The site auto-deploys when you push to `main`. Your Supabase URL and publishable key live in `js/supabase-config.js` (safe for client-side use — never put your **service role** key there).
 
-**GitHub repo → Settings → Secrets and variables → Actions → New repository secret**
+Enable Pages: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-| Secret name           | Value                                      |
-|-----------------------|--------------------------------------------|
-| `SUPABASE_URL`        | `https://fspoirkopheconjavjop.supabase.co` |
-| `SUPABASE_ANON_KEY`   | Your Supabase anon / publishable key       |
-
-Also enable Pages: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-
-If a deploy shows **"Deployment cancelled"**, open **Actions**, re-run the latest workflow, and wait for it to finish (a newer push can cancel the previous run).
-
-Live site: `https://kingattah.github.io/specialcutz/`
+Live site: `https://kingattah.github.io/specialcutz/`  
 Admin panel: `https://kingattah.github.io/specialcutz/admin.html`
 

@@ -22,15 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure Supabase (from secrets)
-        run: |
-          cat > js/supabase-config.js <<'EOF'
-          window.SUPABASE_CONFIG = {
-            url: "${{ secrets.SUPABASE_URL }}",
-            anonKey: "${{ secrets.SUPABASE_ANON_KEY }}",
-          };
-          EOF
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

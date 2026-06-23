@@ -10,8 +10,8 @@
   }
 
   if (
-    config.url === "YOUR_SUPABASE_URL" ||
-    config.anonKey === "YOUR_SUPABASE_ANON_KEY"
+    config.url.includes("YOUR_PROJECT") ||
+    config.anonKey.includes("YOUR_SUPABASE")
   ) {
     console.warn(
       "Supabase is not configured yet. Add your URL and anon key in js/supabase-config.js"
