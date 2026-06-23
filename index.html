@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Special Cutz — Video Editor & Social Media Manager. Creative video production and social content strategy.">
+  <title>Special Cutz | Video Editor & Social Media Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-mesh" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!--
+    PLACEHOLDER CONTENT — replace as needed:
+    Email: hello@specialcutz.com
+    Location: [Your City]
+    Social: update href="#" on Instagram, LinkedIn, YouTube
+    Stats, blog titles, testimonial — search section comments below
+    Portfolio thumbnails: replace Unsplash URLs in .work-thumb img or use assets/img/
+    Form backend: wire Formspree/Netlify later (see #contact form note)
+  -->
+
+  <!-- Navbar -->
+  <header class="site-header fixed-top" id="siteHeader">
+    <nav class="navbar navbar-dark navbar-expand-lg py-3">
+      <div class="container-fluid px-4 px-lg-5">
+        <a class="navbar-brand" href="#hero">
+          <img
+            src="assets/img/logo.jpeg"
+            alt="Special Cutz"
+            class="brand-logo"
+            width="120"
+            height="120"
+            loading="eager"
+          >
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#navOffcanvas" aria-controls="navOffcanvas" aria-label="Open menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="d-none d-lg-flex ms-auto align-items-center gap-4">
+          <ul class="navbar-nav gap-1">
+            <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+            <li class="nav-item"><a class="nav-link" href="#works">Works</a></li>
+            <li class="nav-item"><a class="nav-link" href="#blog">Blog</a></li>
+            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          </ul>
+          <a href="#contact" class="btn btn-accent btn-sm nav-cta">Hire me</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="navOffcanvas" aria-labelledby="navOffcanvasLabel">
+    <div class="offcanvas-header border-bottom border-secondary border-opacity-25">
+      <h5 class="offcanvas-title" id="navOffcanvasLabel">Menu</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="navbar-nav gap-3 fs-5">
+        <li class="nav-item"><a class="nav-link" href="#services" data-bs-dismiss="offcanvas">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#works" data-bs-dismiss="offcanvas">Works</a></li>
+        <li class="nav-item"><a class="nav-link" href="#blog" data-bs-dismiss="offcanvas">Blog</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact" data-bs-dismiss="offcanvas">Contact</a></li>
+      </ul>
+      <a href="#contact" class="btn btn-accent w-100 mt-4" data-bs-dismiss="offcanvas">Hire me</a>
+    </div>
+  </div>
+
+  <main>
+    <!-- Hero -->
+    <section id="hero" class="hero section-pad">
+      <div class="hero-bg" aria-hidden="true">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+      </div>
+      <div class="container-fluid px-4 px-lg-5">
+        <div class="row align-items-center g-4 g-lg-5">
+          <div class="col-lg-4 order-2 order-lg-1">
+            <div class="hero-brand reveal" data-parallax="0.12">
+              <span class="hero-badge">
+                <span class="badge-dot"></span>
+                Available for projects
+              </span>
+              <h1 class="hero-title display-1 fw-bold mb-3">
+                Special<br><span class="text-gradient">Cutz</span>
+              </h1>
+              <div class="accent-line"></div>
+              <div class="hero-social d-flex gap-3 mt-4">
+                <a href="#" class="social-link" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="social-link" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                <a href="#" class="social-link" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4 order-1 order-lg-2 text-center">
+            <div class="hero-portrait-wrap reveal reveal-delay-1" data-parallax="0.18">
+              <div class="portrait-aura" aria-hidden="true">
+                <span class="aura-blob aura-blob-1"></span>
+                <span class="aura-blob aura-blob-2"></span>
+                <span class="aura-blob aura-blob-3"></span>
+              </div>
+              <img
+                src="assets/img/photo_2026-06-03_14-01-44.jpg"
+                alt="Special Cutz — Video Editor & Social Media Manager"
+                class="hero-portrait img-fluid"
+                width="420"
+                height="560"
+                loading="eager"
+              >
+            </div>
+          </div>
+          <div class="col-lg-4 order-3">
+            <div class="hero-intro reveal reveal-delay-2" data-parallax="0.1">
+              <span class="section-label">Introduction</span>
+              <h2 class="hero-headline h3 fw-semibold mt-2 mb-3">
+                Video Editor &amp; Social Media Manager based in <span class="text-gradient-inline">Lagos</span>.
+              </h2>
+              <p class="text-muted mb-4">
+                I craft scroll-stopping video content and build cohesive social presence for brands and creators. From short-form reels to full campaign edits, I turn ideas into visuals that connect.
+              </p>
+              <div class="hero-tags d-flex flex-wrap gap-2 mb-4">
+                <span class="tag-pill">Reels</span>
+                <span class="tag-pill">Brand Films</span>
+                <span class="tag-pill">Social Growth</span>
+              </div>
+              <a href="#about" class="btn btn-glass">
+                My story
+                <i class="bi bi-arrow-up-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="marquee-wrap" aria-hidden="true">
+        <div class="marquee">
+          <span>Video Editing</span><span class="marquee-dot">◆</span>
+          <span>Social Media</span><span class="marquee-dot">◆</span>
+          <span>Content Strategy</span><span class="marquee-dot">◆</span>
+          <span>Reels &amp; Shorts</span><span class="marquee-dot">◆</span>
+          <span>Brand Storytelling</span><span class="marquee-dot">◆</span>
+          <span>Video Editing</span><span class="marquee-dot">◆</span>
+          <span>Social Media</span><span class="marquee-dot">◆</span>
+          <span>Content Strategy</span><span class="marquee-dot">◆</span>
+          <span>Reels &amp; Shorts</span><span class="marquee-dot">◆</span>
+          <span>Brand Storytelling</span><span class="marquee-dot">◆</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- About (My story anchor) -->
+    <section id="about" class="about section-pad-sm">
+      <div class="container px-4 px-lg-5">
+        <div class="row justify-content-center">
+          <div class="col-lg-8 text-center reveal">
+            <span class="section-label" data-parallax="0.06"><span class="section-num">01</span> About</span>
+            <p class="lead mt-3 mb-0 about-text">
+              Special Cutz is a creative studio focused on video production and social media growth. I partner with businesses and influencers to deliver polished edits, consistent posting, and content that reflects your brand voice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact + Stats -->
+    <section id="contact-band" class="contact-band section-pad">
+      <div class="container-fluid px-4 px-lg-5">
+        <div class="row g-5 g-xl-6">
+          <div class="col-lg-6 reveal">
+            <span class="section-label"><span class="section-num">02</span> Contact</span>
+            <h2 class="display-5 fw-bold mt-2 mb-4">Any Type Of Query<br>&amp; Discussion.</h2>
+            <p class="text-muted mb-4">
+              Have a project in mind or need a content partner? Reach out — I typically respond within 24 hours.
+            </p>
+            <a href="mailto:hello@specialcutz.com" class="email-link display-6 fw-semibold">
+              hello@specialcutz.com
+              <i class="bi bi-arrow-up-right"></i>
+            </a>
+          </div>
+          <div class="col-lg-6 reveal reveal-delay-1">
+            <blockquote class="quote-block glass-card mb-5">
+              <span class="quote-mark" aria-hidden="true">&ldquo;</span>
+              <p class="quote-text fst-italic">
+                Creativity is intelligence having fun. Great content is where strategy meets storytelling.
+              </p>
+            </blockquote>
+            <div class="row g-3 stats-row">
+              <div class="col-6 col-md-4">
+                <div class="stat-item glass-card">
+                  <span class="stat-number" data-count="3">3+</span>
+                  <span class="stat-label">Years of Experience</span>
+                </div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-item glass-card">
+                  <span class="stat-number" data-count="48">48</span>
+                  <span class="stat-label">Projects Completed</span>
+                </div>
+              </div>
+              <div class="col-12 col-md-4">
+                <div class="stat-item glass-card">
+                  <span class="stat-number" data-count="25">25</span>
+                  <span class="stat-label">Happy Clients</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" class="services section-pad-sm">
+      <div class="container-fluid px-4 px-lg-5">
+        <div class="section-head reveal mb-4 mb-lg-5">
+          <span class="section-label"><span class="section-num">03</span> Services</span>
+          <h2 class="h2 fw-bold mt-2 mb-0">What I do best</h2>
+        </div>
+        <div class="row g-3 g-lg-4">
+          <div class="col-md-4 reveal">
+            <article class="service-card active" data-service="video-editing" tabindex="0" role="button" aria-pressed="true">
+              <span class="service-num">01</span>
+              <div class="service-icon"><i class="bi bi-camera-reels"></i></div>
+              <h3 class="service-title h5 fw-semibold">Video Editing</h3>
+              <p class="service-count mb-0">Projects</p>
+            </article>
+          </div>
+          <div class="col-md-4 reveal reveal-delay-1">
+            <article class="service-card" data-service="social-media" tabindex="0" role="button" aria-pressed="false">
+              <span class="service-num">02</span>
+              <div class="service-icon"><i class="bi bi-share"></i></div>
+              <h3 class="service-title h5 fw-semibold">Social Media Management</h3>
+              <p class="service-count mb-0">Projects</p>
+            </article>
+          </div>
+          <div class="col-md-4 reveal reveal-delay-2">
+            <article class="service-card" data-service="content-strategy" tabindex="0" role="button" aria-pressed="false">
+              <span class="service-num">03</span>
+              <div class="service-icon"><i class="bi bi-lightbulb"></i></div>
+              <h3 class="service-title h5 fw-semibold">Content Strategy</h3>
+              <p class="service-count mb-0">Campaigns</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Works -->
+    <section id="works" class="works section-pad">
+      <div class="container-fluid px-4 px-lg-5">
+        <div class="works-header row align-items-end mb-5 reveal">
+          <div class="col-lg-8">
+            <span class="section-label" data-parallax="0.05"><span class="section-num">04</span> Portfolio</span>
+            <h2 class="display-5 fw-bold mt-2">All Creative Works,<br><span class="text-gradient-inline">Selected projects.</span></h2>
+          </div>
+          <div class="col-lg-4 text-lg-end d-none d-lg-block">
+            <a href="#contact" class="btn btn-glass">Start a project <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="row g-4 work-grid" id="workGrid">
+          <div class="col-12">
+            <div class="works-loading glass-card text-center p-5">
+              <div class="spinner-border text-light mb-3" role="status" aria-hidden="true"></div>
+              <p class="text-muted mb-0">Loading portfolio…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Blog + Testimonial -->
+    <section id="blog" class="blog section-pad">
+      <div class="container-fluid px-4 px-lg-5">
+        <div class="row g-5">
+          <div class="col-lg-6 reveal">
+            <span class="section-label"><span class="section-num">05</span> Blog</span>
+            <h2 class="h4 fw-semibold mt-2 mb-4">Recent insights</h2>
+            <ul class="blog-list list-unstyled mb-0">
+              <li class="blog-item">
+                <span class="blog-index">01</span>
+                <div>
+                  <time class="blog-date" datetime="2026-05-12">May 12, 2026</time>
+                  <a href="#" class="blog-title">5 Hooks That Stop the Scroll on Reels</a>
+                </div>
+                <i class="bi bi-arrow-up-right blog-arrow"></i>
+              </li>
+              <li class="blog-item">
+                <span class="blog-index">02</span>
+                <div>
+                  <time class="blog-date" datetime="2026-04-28">Apr 28, 2026</time>
+                  <a href="#" class="blog-title">Building a Consistent Brand Aesthetic</a>
+                </div>
+                <i class="bi bi-arrow-up-right blog-arrow"></i>
+              </li>
+              <li class="blog-item">
+                <span class="blog-index">03</span>
+                <div>
+                  <time class="blog-date" datetime="2026-03-15">Mar 15, 2026</time>
+                  <a href="#" class="blog-title">From Raw Footage to Polished Campaign Edit</a>
+                </div>
+                <i class="bi bi-arrow-up-right blog-arrow"></i>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-6 reveal reveal-delay-1">
+            <span class="section-label">Testimonial</span>
+            <figure class="testimonial glass-card mt-3">
+              <blockquote class="mb-4">
+                <p>&ldquo;Special Cutz transformed our social presence. The edits are sharp, on-brand, and our engagement doubled within two months.&rdquo;</p>
+              </blockquote>
+              <figcaption class="d-flex align-items-center gap-3">
+                <img class="testimonial-avatar" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80&auto=format&fit=crop" alt="" width="56" height="56" loading="lazy" data-fallback="https://picsum.photos/seed/specialcutz-client/120/120">
+                <div>
+                  <cite class="testimonial-name fw-semibold d-block not-italic">Amina K.</cite>
+                  <span class="testimonial-role text-muted small">Marketing Director, Nova Brand Co.</span>
+                </div>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section id="contact" class="contact-form section-pad-sm pb-5">
+      <div class="container px-4 px-lg-5">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="form-panel gradient-border p-4 p-lg-5 rounded-4 reveal">
+              <span class="section-label"><span class="section-num">06</span> Get in touch</span>
+              <h2 class="h3 fw-bold mt-2 mb-4">Estimate your project</h2>
+              <!-- Wire to Formspree/Netlify: change form action & method -->
+              <form id="estimateForm" novalidate>
+                <div class="mb-3">
+                  <label for="name" class="form-label">Name</label>
+                  <input type="text" class="form-control form-control-lg" id="name" name="name" required autocomplete="name">
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control form-control-lg" id="email" name="email" required autocomplete="email">
+                </div>
+                <div class="mb-4">
+                  <label for="message" class="form-label">Message</label>
+                  <textarea class="form-control form-control-lg" id="message" name="message" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-accent btn-lg px-5">Send message</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer py-5">
+    <div class="container-fluid px-4 px-lg-5">
+      <div class="row align-items-center g-4">
+        <div class="col-md-4 text-center text-md-start">
+          <img
+            src="assets/img/logo.jpeg"
+            alt="Special Cutz"
+            class="footer-logo"
+            width="120"
+            height="120"
+            loading="lazy"
+          >
+          <p class="text-muted small mb-0 mt-1">&copy; <span id="year"></span> All rights reserved.</p>
+        </div>
+        <div class="col-md-4 d-flex justify-content-center gap-3">
+          <a href="#" class="social-link" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="social-link" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="social-link" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+        </div>
+        <div class="col-md-4 text-center text-md-end">
+          <button type="button" class="btn btn-outline-light btn-sm back-to-top" id="backToTop" aria-label="Back to top">
+            <i class="bi bi-arrow-up"></i> Top
+          </button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="formToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">Thanks! Your message is ready to send — connect Formspree for live delivery.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work lightbox -->
+  <div class="modal fade work-lightbox" id="workLightbox" tabindex="-1" aria-labelledby="lightboxTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header border-secondary border-opacity-25">
+          <div>
+            <h2 class="modal-title h5 mb-0" id="lightboxTitle"></h2>
+            <span class="text-muted small" id="lightboxCategory"></span>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0" id="lightboxMedia"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/works.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
