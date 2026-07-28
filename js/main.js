@@ -211,7 +211,7 @@
         `Name: ${name}\nEmail: ${email}\n\n${message}`
       );
 
-      window.location.href = `mailto:hello@specialcutz.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:achumgrace82@gmail.com?subject=${subject}&body=${body}`;
       toast.show();
       form.reset();
       form.classList.remove("was-validated");
