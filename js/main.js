@@ -131,15 +131,28 @@
     if (!cards.length) return;
 
     function activate(card) {
-      cards.forEach((c) => {
-        const isActive = c === card;
-        c.classList.toggle("active", isActive);
-        c.setAttribute("aria-pressed", isActive ? "true" : "false");
-      });
-
       const service = card.getAttribute("data-service");
-      if (service && window.PortfolioWorks) {
+      if (!service) return;
+
+      if (window.PortfolioWorks) {
         window.PortfolioWorks.setActiveService(service);
+      } else {
+        cards.forEach((c) => {
+          const isActive = c === card;
+          c.classList.toggle("active", isActive);
+          c.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+      }
+
+      const works = document.getElementById("works");
+      if (works) {
+        const headerOffset = 80;
+        const top =
+          works.getBoundingClientRect().top + window.scrollY - headerOffset;
+        window.scrollTo({
+          top,
+          behavior: prefersReducedMotion() ? "auto" : "smooth",
+        });
       }
     }
 

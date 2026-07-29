@@ -918,6 +918,33 @@ body.no-parallax [data-parallax] {
   letter-spacing: 0.06em;
 }
 
+.works-filters {
+  margin-top: -0.5rem;
+}
+
+.works-filter-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.works-filter-btn:hover {
+  color: var(--text);
+  border-color: rgba(147, 51, 234, 0.45);
+}
+
+.works-filter-btn.is-active {
+  color: #fff;
+  border-color: rgba(147, 51, 234, 0.7);
+  background: rgba(147, 51, 234, 0.28);
+}
+
 .work-card-btn {
   width: 100%;
   padding: 0;

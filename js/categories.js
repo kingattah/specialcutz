@@ -21,6 +21,7 @@
   };
 
   const SERVICE_FILTERS = {
+    all: null,
     "video-editing": ["video-production", "video-editing"],
     "social-media": ["social-media"],
     "content-strategy": ["content-strategy"],
@@ -41,7 +42,17 @@
       }));
     },
 
+    getFilterOptions() {
+      return [
+        { value: "all", label: "All" },
+        { value: "video-editing", label: "Video Editing" },
+        { value: "social-media", label: "Social Media" },
+        { value: "content-strategy", label: "Content Strategy" },
+      ];
+    },
+
     matchesService(categorySlug, serviceSlug) {
+      if (!serviceSlug || serviceSlug === "all") return true;
       const allowed = SERVICE_FILTERS[serviceSlug];
       if (!allowed) return true;
       return allowed.includes(categorySlug);

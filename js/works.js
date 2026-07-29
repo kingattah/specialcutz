@@ -3,7 +3,7 @@
 
   const BUCKET = "portfolio-media";
   let allWorks = [];
-  let activeService = "video-editing";
+  let activeService = "all";
   let lightboxModal = null;
 
   function getClient() {
@@ -126,6 +126,48 @@
     );
   }
 
+  function renderFilters() {
+    const wrap = document.getElementById("worksFilters");
+    if (!wrap || !window.PortfolioCategories) return;
+
+    wrap.innerHTML = PortfolioCategories.getFilterOptions()
+      .map((opt) => {
+        const isActive = opt.value === activeService;
+        return `
+          <button
+            type="button"
+            class="works-filter-btn${isActive ? " is-active" : ""}"
+            data-filter="${opt.value}"
+            role="tab"
+            aria-selected="${isActive ? "true" : "false"}"
+          >${escapeHtml(opt.label)}</button>
+        `;
+      })
+      .join("");
+
+    wrap.querySelectorAll("[data-filter]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setActiveService(btn.dataset.filter, { syncServices: true });
+      });
+    });
+  }
+
+  function syncServiceCards(serviceSlug) {
+    document.querySelectorAll("[data-service]").forEach((card) => {
+      const isActive = serviceSlug !== "all" && card.dataset.service === serviceSlug;
+      card.classList.toggle("active", isActive);
+      card.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+  }
+
+  function syncFilterButtons() {
+    document.querySelectorAll("#worksFilters [data-filter]").forEach((btn) => {
+      const isActive = btn.dataset.filter === activeService;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+  }
+
   function renderGrid(works) {
     const grid = document.getElementById("workGrid");
     if (!grid) return;
@@ -192,25 +234,34 @@
         PortfolioCategories.matchesService(w.category, service)
       ).length;
 
-      if (service === "video-editing") {
-        countEl.textContent = count ? `${count} Project${count !== 1 ? "s" : ""}` : "Projects";
-      } else if (service === "social-media") {
-        countEl.textContent = count ? `${count} Project${count !== 1 ? "s" : ""}` : "Projects";
+      if (service === "content-strategy") {
+        countEl.textContent = count
+          ? `${count} Campaign${count !== 1 ? "s" : ""}`
+          : "Campaigns";
       } else {
-        countEl.textContent = count ? `${count} Campaign${count !== 1 ? "s" : ""}` : "Campaigns";
+        countEl.textContent = count
+          ? `${count} Project${count !== 1 ? "s" : ""}`
+          : "Projects";
       }
     });
   }
 
   async function loadAndRender(serviceSlug) {
     allWorks = await fetchWorks();
+    activeService = serviceSlug || "all";
+    renderFilters();
     updateServiceCounts();
-    renderGrid(filterWorks(serviceSlug));
+    syncServiceCards(activeService);
+    renderGrid(filterWorks(activeService));
   }
 
-  function setActiveService(serviceSlug) {
-    activeService = serviceSlug;
-    renderGrid(filterWorks(serviceSlug));
+  function setActiveService(serviceSlug, options) {
+    activeService = serviceSlug || "all";
+    syncFilterButtons();
+    if (options?.syncServices !== false) {
+      syncServiceCards(activeService);
+    }
+    renderGrid(filterWorks(activeService));
   }
 
   window.PortfolioWorks = {
@@ -222,7 +273,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("workGrid")) {
-      loadAndRender("video-editing");
+      loadAndRender("all");
     }
   });
 })();
