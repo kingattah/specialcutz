@@ -3,6 +3,7 @@
 
   const BUCKET = "portfolio-media";
   const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+  const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5 MB
 
   let currentUser = null;
 
@@ -70,8 +71,12 @@
     togglePanels(!!currentUser);
 
     if (currentUser) {
-      await loadAdminWorks();
+      await loadAdminContent();
     }
+  }
+
+  async function loadAdminContent() {
+    await Promise.all([loadAdminWorks(), loadAdminTestimonials()]);
   }
 
   async function handleLogin(e) {
@@ -102,7 +107,7 @@
     togglePanels(true);
     form.reset();
     showToast("Signed in successfully.");
-    await loadAdminWorks();
+    await loadAdminContent();
   }
 
   async function handleLogout() {
@@ -113,6 +118,7 @@
     currentUser = null;
     togglePanels(false);
     document.getElementById("adminWorksList").innerHTML = "";
+    document.getElementById("adminTestimonialsList").innerHTML = "";
     showToast("Signed out.");
   }
 
@@ -122,13 +128,13 @@
     return null;
   }
 
-  function buildStoragePath(file) {
+  function buildStoragePath(file, prefix) {
     const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
     const safeName = file.name
       .replace(/\.[^.]+$/, "")
       .replace(/[^a-z0-9-_]+/gi, "-")
       .slice(0, 40);
-    return `${Date.now()}-${safeName}.${ext}`;
+    return `${prefix || ""}${Date.now()}-${safeName}.${ext}`;
   }
 
   async function handleUpload(e) {
@@ -295,19 +301,197 @@
     await loadAdminWorks();
   }
 
+  function getInitials(name) {
+    return String(name || "")
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("");
+  }
+
+  async function handleTestimonialSubmit(e) {
+    e.preventDefault();
+    const client = getClient();
+    if (!client || !currentUser) return;
+
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+
+    const quote = form.quote.value.trim();
+    const authorName = form.authorName.value.trim();
+    const authorRole = form.authorRole.value.trim();
+    const avatarFile = form.avatar.files[0];
+
+    if (!quote || !authorName) {
+      showToast("Add both a testimonial and a client name.", "warning");
+      return;
+    }
+
+    if (avatarFile) {
+      if (!avatarFile.type.startsWith("image/")) {
+        showToast("Client photo must be an image.", "error");
+        return;
+      }
+      if (avatarFile.size > MAX_AVATAR_SIZE) {
+        showToast("Client photo must be under 5 MB.", "error");
+        return;
+      }
+    }
+
+    setLoading(btn, true);
+
+    let avatarUrl = null;
+    let storagePath = null;
+
+    if (avatarFile) {
+      storagePath = buildStoragePath(avatarFile, "testimonials/");
+
+      const { error: uploadError } = await client.storage
+        .from(BUCKET)
+        .upload(storagePath, avatarFile, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: avatarFile.type,
+        });
+
+      if (uploadError) {
+        setLoading(btn, false);
+        showToast(uploadError.message, "error");
+        return;
+      }
+
+      avatarUrl = client.storage.from(BUCKET).getPublicUrl(storagePath).data
+        .publicUrl;
+    }
+
+    const { error: insertError } = await client.from("testimonials").insert({
+      quote,
+      author_name: authorName,
+      author_role: authorRole || null,
+      avatar_url: avatarUrl,
+      storage_path: storagePath,
+    });
+
+    setLoading(btn, false);
+
+    if (insertError) {
+      if (storagePath) {
+        await client.storage.from(BUCKET).remove([storagePath]);
+      }
+      showToast(insertError.message, "error");
+      return;
+    }
+
+    form.reset();
+    showToast("Testimonial added.");
+    await loadAdminTestimonials();
+  }
+
+  function renderAdminTestimonialItem(item) {
+    const avatar = item.avatar_url
+      ? `<img src="${escapeHtml(item.avatar_url)}" alt="" class="admin-work-thumb admin-avatar-thumb">`
+      : `<div class="admin-work-thumb admin-avatar-thumb admin-avatar-initials">${escapeHtml(getInitials(item.author_name))}</div>`;
+
+    const role = item.author_role
+      ? ` · ${escapeHtml(item.author_role)}`
+      : "";
+
+    return `
+      <div class="admin-work-item glass-card" data-id="${item.id}">
+        ${avatar}
+        <div class="admin-work-info flex-grow-1">
+          <p class="admin-quote mb-1">&ldquo;${escapeHtml(item.quote)}&rdquo;</p>
+          <p class="text-muted small mb-0">${escapeHtml(item.author_name)}${role}</p>
+        </div>
+        <button type="button" class="btn btn-outline-danger btn-sm admin-testimonial-delete" data-id="${item.id}" aria-label="Delete testimonial from ${escapeHtml(item.author_name)}">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    `;
+  }
+
+  async function loadAdminTestimonials() {
+    const client = getClient();
+    const list = document.getElementById("adminTestimonialsList");
+    if (!client || !list) return;
+
+    list.innerHTML = `<p class="text-muted small mb-0">Loading…</p>`;
+
+    const { data, error } = await client
+      .from("testimonials")
+      .select("*")
+      .order("sort_order", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      list.innerHTML = `<p class="text-danger small mb-0">${escapeHtml(error.message)}</p>`;
+      return;
+    }
+
+    if (!data?.length) {
+      list.innerHTML = `<p class="text-muted small mb-0">No testimonials yet. Add your first one above.</p>`;
+      return;
+    }
+
+    list.innerHTML = data.map(renderAdminTestimonialItem).join("");
+
+    list.querySelectorAll(".admin-testimonial-delete").forEach((btn) => {
+      btn.addEventListener("click", () => deleteTestimonial(btn.dataset.id));
+    });
+  }
+
+  async function deleteTestimonial(id) {
+    const client = getClient();
+    if (!client || !currentUser) return;
+
+    if (!confirm("Delete this testimonial? This cannot be undone.")) return;
+
+    const { data: item, error: fetchError } = await client
+      .from("testimonials")
+      .select("storage_path")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) {
+      showToast(fetchError.message, "error");
+      return;
+    }
+
+    const { error: deleteError } = await client
+      .from("testimonials")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      showToast(deleteError.message, "error");
+      return;
+    }
+
+    if (item?.storage_path) {
+      await client.storage.from(BUCKET).remove([item.storage_path]);
+    }
+
+    showToast("Testimonial deleted.");
+    await loadAdminTestimonials();
+  }
+
   function init() {
     populateCategorySelect();
 
     document.getElementById("loginForm")?.addEventListener("submit", handleLogin);
     document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
     document.getElementById("uploadForm")?.addEventListener("submit", handleUpload);
+    document
+      .getElementById("testimonialForm")
+      ?.addEventListener("submit", handleTestimonialSubmit);
 
     checkSession();
 
     getClient()?.auth.onAuthStateChange((_event, session) => {
       currentUser = session?.user || null;
       togglePanels(!!currentUser);
-      if (currentUser) loadAdminWorks();
+      if (currentUser) loadAdminContent();
     });
   }
 

@@ -11,7 +11,9 @@ Follow these steps to enable admin uploads and dynamic portfolio works.
 
 1. Open **SQL Editor** in your Supabase dashboard.
 2. Copy the contents of `supabase/schema.sql` and run it.
-3. This creates the `works` table, storage bucket, and security policies.
+3. This creates the `works` and `testimonials` tables, storage bucket, and security policies.
+
+The whole file is safe to re-run on an existing project — it recreates policies rather than failing on ones that already exist, and never drops your data.
 
 ## 3. Create your admin account
 
@@ -54,14 +56,20 @@ Works appear on the main site portfolio grid. Clicking a service card filters th
 | Social Media       | Social Media Management      |
 | Content Strategy   | Content Strategy             |
 
+## 6. Add testimonials
+
+In `admin.html`, scroll to **Add testimonial** and enter the quote, client name, and optionally their role and photo. Saved testimonials appear in the Blog section of the site.
+
+When there is more than one, the site rotates through them and shows dot navigation. Clients without a photo get their initials on a purple tile.
+
 ## File limits
 
-- Max upload size: **100 MB** per file
-- Supported: JPG, PNG, WebP, GIF, MP4, WebM, MOV
+- Works: **100 MB** per file — JPG, PNG, WebP, GIF, MP4, WebM, MOV
+- Testimonial photos: **5 MB** per image
 
 To increase limits, adjust Supabase Storage settings in your project dashboard.
 
-## 6. Deploy on GitHub Pages
+## 7. Deploy on GitHub Pages
 
 The site auto-deploys when you push to `main`. Your Supabase URL and publishable key live in `js/supabase-config.js` (safe for client-side use — never put your **service role** key there).
 
