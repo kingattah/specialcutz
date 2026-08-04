@@ -38,7 +38,7 @@
       <section id="loginPanel" class="admin-panel gradient-border rounded-4 p-4 p-lg-5">
         <span class="section-label">Admin</span>
         <h1 class="h3 fw-bold mt-2 mb-2">Sign in</h1>
-        <p class="text-muted mb-4">Upload videos and images to your portfolio categories.</p>
+        <p class="text-muted mb-4">Upload videos, images, flyers, PDFs, and YouTube links to your portfolio categories.</p>
 
         <form id="loginForm" novalidate>
           <div class="mb-3">
@@ -83,10 +83,28 @@
                 Works appear in the portfolio grid and filter by service type.
               </div>
             </div>
-            <div class="mb-4">
-              <label for="uploadMedia" class="form-label">Image or video</label>
-              <input type="file" class="form-control form-control-lg" id="uploadMedia" name="media" accept="image/*,video/*" required>
-              <div class="form-text text-muted">Max 100 MB. JPG, PNG, WebP, MP4, WebM, MOV.</div>
+            <div class="mb-3">
+              <span class="form-label d-block">Media source</span>
+              <div class="admin-source-toggle btn-group w-100" role="group" aria-label="Media source">
+                <input type="radio" class="btn-check" name="mediaSource" id="sourceFile" value="file" checked>
+                <label class="btn btn-outline-light" for="sourceFile">
+                  <i class="bi bi-file-earmark-media"></i> File upload
+                </label>
+                <input type="radio" class="btn-check" name="mediaSource" id="sourceYoutube" value="youtube">
+                <label class="btn btn-outline-light" for="sourceYoutube">
+                  <i class="bi bi-youtube"></i> YouTube link
+                </label>
+              </div>
+            </div>
+            <div class="mb-4" id="uploadFileField">
+              <label for="uploadMedia" class="form-label">Image, video, or PDF</label>
+              <input type="file" class="form-control form-control-lg" id="uploadMedia" name="media" accept="image/*,video/*,.pdf,application/pdf,.svg,.tif,.tiff,.bmp,.avif,.heic,.heif">
+              <div class="form-text text-muted">Flyers &amp; graphics: JPG, PNG, WebP, GIF, SVG, BMP, TIFF, AVIF, PDF. Videos: MP4, WebM, MOV. Max 50 MB.</div>
+            </div>
+            <div class="mb-4 d-none" id="uploadYoutubeField">
+              <label for="uploadYoutubeUrl" class="form-label">YouTube URL</label>
+              <input type="url" class="form-control form-control-lg" id="uploadYoutubeUrl" name="youtubeUrl" placeholder="https://www.youtube.com/watch?v=… or https://youtu.be/…">
+              <div class="form-text text-muted">Paste any YouTube watch, share, Shorts, or embed link. No file size limit.</div>
             </div>
             <button type="submit" class="btn btn-accent btn-lg w-100">
               <span class="btn-label"><i class="bi bi-cloud-upload"></i> Upload work</span>

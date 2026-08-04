@@ -16,6 +16,27 @@
     return div.innerHTML;
   }
 
+  function extractYoutubeId(url) {
+    if (!url) return null;
+    const patterns = [
+      /(?:youtube\.com\/watch\?(?:[^#]*&)?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/live\/([A-Za-z0-9_-]{11})/,
+    ];
+    for (const pattern of patterns) {
+      const match = String(url).trim().match(pattern);
+      if (match?.[1]) return match[1];
+    }
+    return null;
+  }
+
+  function youtubeEmbedUrl(videoId) {
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  }
+
+  function youtubeThumbnailUrl(videoId) {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  }
+
   function getPublicUrl(path) {
     const client = getClient();
     if (!client) return "";
@@ -44,9 +65,13 @@
   function renderWorkCard(work, index) {
     const label = PortfolioCategories.getLabel(work.category);
     const isVideo = work.media_type === "video";
+    const isYoutube = work.media_type === "youtube";
+    const isPdf = work.media_type === "pdf";
+    const youtubeId = isYoutube ? extractYoutubeId(work.media_url) : null;
     const thumbSrc =
       work.thumbnail_url ||
-      (isVideo ? null : work.media_url);
+      (youtubeId ? youtubeThumbnailUrl(youtubeId) : null) ||
+      (isVideo || isYoutube || isPdf ? null : work.media_url);
     const delayClass =
       index % 3 === 1
         ? " reveal-delay-1"
@@ -54,19 +79,35 @@
           ? " reveal-delay-2"
           : "";
 
-    const thumbContent = isVideo
-      ? thumbSrc
+    let thumbContent;
+    if (isYoutube) {
+      thumbContent = thumbSrc
         ? `<img src="${escapeHtml(thumbSrc)}" alt="${escapeHtml(work.title)}" loading="lazy">`
-        : `<video src="${escapeHtml(work.media_url)}" muted playsinline preload="metadata"></video>`
-      : `<img src="${escapeHtml(work.media_url)}" alt="${escapeHtml(work.title)}" loading="lazy">`;
+        : `<div class="work-thumb-fallback"><i class="bi bi-youtube"></i></div>`;
+    } else if (isVideo) {
+      thumbContent = thumbSrc
+        ? `<img src="${escapeHtml(thumbSrc)}" alt="${escapeHtml(work.title)}" loading="lazy">`
+        : `<video src="${escapeHtml(work.media_url)}" muted playsinline preload="metadata"></video>`;
+    } else if (isPdf) {
+      thumbContent = `<div class="work-thumb-fallback work-thumb-pdf"><i class="bi bi-file-earmark-pdf"></i><span>PDF</span></div>`;
+    } else {
+      thumbContent = `<img src="${escapeHtml(work.media_url)}" alt="${escapeHtml(work.title)}" loading="lazy">`;
+    }
 
-    const overlayIcon = isVideo ? "bi-play-circle" : "bi-zoom-in";
-    const overlayText = isVideo ? "Play video" : "View image";
+    let overlayIcon = "bi-zoom-in";
+    let overlayText = "View image";
+    if (isVideo || isYoutube) {
+      overlayIcon = "bi-play-circle";
+      overlayText = "Play video";
+    } else if (isPdf) {
+      overlayIcon = "bi-file-earmark-pdf";
+      overlayText = "View flyer";
+    }
 
     return `
       <div class="col-6 col-lg-4 reveal${delayClass}" data-work-id="${work.id}" data-category="${work.category}">
         <button type="button" class="work-card work-card-btn" data-work-id="${work.id}" aria-label="Open ${escapeHtml(work.title)}">
-          <div class="work-thumb${isVideo ? " work-thumb-video" : ""}">
+          <div class="work-thumb${isVideo || isYoutube || isPdf ? " work-thumb-video" : ""}">
             ${thumbContent}
             <span class="work-overlay"><i class="bi ${overlayIcon}"></i> ${overlayText}</span>
           </div>
@@ -202,8 +243,23 @@
     titleEl.textContent = work.title;
     catEl.textContent = PortfolioCategories.getLabel(work.category);
 
-    if (work.media_type === "video") {
+    if (work.media_type === "youtube") {
+      const videoId = extractYoutubeId(work.media_url);
+      if (videoId) {
+        mediaEl.innerHTML = `<div class="lightbox-youtube"><iframe src="${escapeHtml(youtubeEmbedUrl(videoId))}" title="${escapeHtml(work.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>`;
+      } else {
+        mediaEl.innerHTML = `<p class="text-muted mb-0 p-4">Unable to load this YouTube video.</p>`;
+      }
+    } else if (work.media_type === "video") {
       mediaEl.innerHTML = `<video src="${escapeHtml(work.media_url)}" controls autoplay playsinline class="lightbox-video"></video>`;
+    } else if (work.media_type === "pdf") {
+      mediaEl.innerHTML = `
+        <div class="lightbox-pdf">
+          <iframe src="${escapeHtml(work.media_url)}#toolbar=1&navpanes=0" title="${escapeHtml(work.title)}" loading="lazy"></iframe>
+          <a href="${escapeHtml(work.media_url)}" class="btn btn-accent btn-sm lightbox-pdf-open" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-box-arrow-up-right"></i> Open PDF
+          </a>
+        </div>`;
     } else {
       mediaEl.innerHTML = `<img src="${escapeHtml(work.media_url)}" alt="${escapeHtml(work.title)}" class="lightbox-image">`;
     }

@@ -2,8 +2,9 @@
   "use strict";
 
   const BUCKET = "portfolio-media";
-  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
-  const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5 MB
+  // Supabase's free plan rejects anything above 50 MB
+  const MAX_FILE_SIZE = 50 * 1024 * 1024;
+  const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
   let currentUser = null;
 
@@ -37,6 +38,18 @@
     const div = document.createElement("div");
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function formatMb(bytes) {
+    return `${Math.round(bytes / (1024 * 1024))} MB`;
+  }
+
+  function describeUploadError(error, limit) {
+    const message = error?.message || "Upload failed.";
+    if (/exceeded the maximum allowed size|payload too large|entity too large/i.test(message)) {
+      return `That file is too large for your Supabase plan. Compress it below ${formatMb(limit)} and try again.`;
+    }
+    return message;
   }
 
   function populateCategorySelect() {
@@ -122,10 +135,124 @@
     showToast("Signed out.");
   }
 
+  function getFileExtension(file) {
+    return (file?.name || "").split(".").pop()?.toLowerCase() || "";
+  }
+
+  const IMAGE_EXTENSIONS = new Set([
+    "jpg",
+    "jpeg",
+    "png",
+    "webp",
+    "gif",
+    "svg",
+    "bmp",
+    "tif",
+    "tiff",
+    "avif",
+    "heic",
+    "heif",
+    "ico",
+    "jfif",
+  ]);
+
+  const VIDEO_EXTENSIONS = new Set([
+    "mp4",
+    "webm",
+    "mov",
+    "m4v",
+    "avi",
+    "mkv",
+    "ogv",
+  ]);
+
+  const MIME_BY_EXTENSION = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    svg: "image/svg+xml",
+    bmp: "image/bmp",
+    tif: "image/tiff",
+    tiff: "image/tiff",
+    avif: "image/avif",
+    heic: "image/heic",
+    heif: "image/heif",
+    ico: "image/x-icon",
+    jfif: "image/jpeg",
+    pdf: "application/pdf",
+    mp4: "video/mp4",
+    webm: "video/webm",
+    mov: "video/quicktime",
+    m4v: "video/x-m4v",
+    avi: "video/x-msvideo",
+    mkv: "video/x-matroska",
+    ogv: "video/ogg",
+  };
+
   function detectMediaType(file) {
-    if (file.type.startsWith("video/")) return "video";
-    if (file.type.startsWith("image/")) return "image";
+    const mime = (file.type || "").toLowerCase();
+    const ext = getFileExtension(file);
+
+    if (mime === "application/pdf" || ext === "pdf") return "pdf";
+    if (mime.startsWith("video/") || VIDEO_EXTENSIONS.has(ext)) return "video";
+    if (mime.startsWith("image/") || IMAGE_EXTENSIONS.has(ext)) return "image";
     return null;
+  }
+
+  function resolveContentType(file, mediaType) {
+    if (file.type) return file.type;
+    const ext = getFileExtension(file);
+    if (MIME_BY_EXTENSION[ext]) return MIME_BY_EXTENSION[ext];
+    if (mediaType === "pdf") return "application/pdf";
+    if (mediaType === "video") return "video/mp4";
+    return "application/octet-stream";
+  }
+
+  function extractYoutubeId(url) {
+    if (!url) return null;
+    const trimmed = url.trim();
+    const patterns = [
+      /(?:youtube\.com\/watch\?(?:[^#]*&)?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/,
+      /youtube\.com\/live\/([A-Za-z0-9_-]{11})/,
+    ];
+    for (const pattern of patterns) {
+      const match = trimmed.match(pattern);
+      if (match?.[1]) return match[1];
+    }
+    return null;
+  }
+
+  function youtubeWatchUrl(videoId) {
+    return `https://www.youtube.com/watch?v=${videoId}`;
+  }
+
+  function youtubeThumbnailUrl(videoId) {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  }
+
+  function getMediaSource(form) {
+    const checked = form.querySelector('input[name="mediaSource"]:checked');
+    return checked?.value || "file";
+  }
+
+  function syncMediaSourceFields() {
+    const form = document.getElementById("uploadForm");
+    if (!form) return;
+
+    const source = getMediaSource(form);
+    const fileField = document.getElementById("uploadFileField");
+    const youtubeField = document.getElementById("uploadYoutubeField");
+    const fileInput = document.getElementById("uploadMedia");
+    const youtubeInput = document.getElementById("uploadYoutubeUrl");
+    const isYoutube = source === "youtube";
+
+    fileField?.classList.toggle("d-none", isYoutube);
+    youtubeField?.classList.toggle("d-none", !isYoutube);
+
+    if (fileInput) fileInput.required = !isYoutube;
+    if (youtubeInput) youtubeInput.required = isYoutube;
   }
 
   function buildStoragePath(file, prefix) {
@@ -144,48 +271,101 @@
 
     const form = e.target;
     const btn = form.querySelector('button[type="submit"]');
-    const fileInput = form.media;
-    const file = fileInput.files[0];
-
-    if (!file) {
-      showToast("Choose an image or video file.", "warning");
-      return;
-    }
-
-    const mediaType = detectMediaType(file);
-    if (!mediaType) {
-      showToast("Only image and video files are allowed.", "error");
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      showToast("File must be under 100 MB.", "error");
-      return;
-    }
-
     const title = form.title.value.trim();
     const category = form.category.value;
+    const source = getMediaSource(form);
 
     if (!title) {
       showToast("Enter a project title.", "warning");
       return;
     }
 
+    if (source === "youtube") {
+      await handleYoutubeUpload(form, btn, title, category);
+      return;
+    }
+
+    await handleFileUpload(form, btn, title, category);
+  }
+
+  async function handleYoutubeUpload(form, btn, title, category) {
+    const client = getClient();
+    const youtubeUrl = form.youtubeUrl.value.trim();
+    const videoId = extractYoutubeId(youtubeUrl);
+
+    if (!videoId) {
+      showToast("Enter a valid YouTube link.", "warning");
+      return;
+    }
+
+    setLoading(btn, true);
+
+    const { error: insertError } = await client.from("works").insert({
+      title,
+      category,
+      media_type: "youtube",
+      media_url: youtubeWatchUrl(videoId),
+      storage_path: null,
+      thumbnail_url: youtubeThumbnailUrl(videoId),
+    });
+
+    setLoading(btn, false);
+
+    if (insertError) {
+      showToast(insertError.message, "error");
+      return;
+    }
+
+    form.reset();
+    document.getElementById("sourceFile").checked = true;
+    syncMediaSourceFields();
+    showToast("YouTube video added to your portfolio.");
+    await loadAdminWorks();
+  }
+
+  async function handleFileUpload(form, btn, title, category) {
+    const client = getClient();
+    const fileInput = form.media;
+    const file = fileInput.files[0];
+
+    if (!file) {
+      showToast("Choose an image, PDF, or video file.", "warning");
+      return;
+    }
+
+    const mediaType = detectMediaType(file);
+    if (!mediaType) {
+      showToast(
+        "Unsupported format. Use an image (JPG, PNG, WebP, GIF, SVG, TIFF…), PDF flyer, or video file.",
+        "error"
+      );
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      showToast(
+        `That file is ${formatMb(file.size)}. Supabase's free plan only accepts uploads under ${formatMb(MAX_FILE_SIZE)} — compress it and try again.`,
+        "error"
+      );
+      return;
+    }
+
     setLoading(btn, true);
 
     const storagePath = buildStoragePath(file);
+    const contentType = resolveContentType(file, mediaType);
 
     const { error: uploadError } = await client.storage
       .from(BUCKET)
       .upload(storagePath, file, {
         cacheControl: "3600",
         upsert: false,
-        contentType: file.type,
+        contentType,
       });
 
     if (uploadError) {
       setLoading(btn, false);
-      showToast(uploadError.message, "error");
+      showToast(describeUploadError(uploadError, MAX_FILE_SIZE), "error");
       return;
     }
 
@@ -211,27 +391,47 @@
     }
 
     form.reset();
+    document.getElementById("sourceFile").checked = true;
+    syncMediaSourceFields();
     showToast("Work uploaded successfully.");
     await loadAdminWorks();
+  }
+
+  function mediaTypeLabel(mediaType) {
+    if (mediaType === "youtube") return "YouTube";
+    if (mediaType === "video") return "Video";
+    if (mediaType === "pdf") return "PDF";
+    return "Image";
   }
 
   function renderAdminWorkItem(work) {
     const label = PortfolioCategories.getLabel(work.category);
     const isVideo = work.media_type === "video";
-    const thumb = work.thumbnail_url || (isVideo ? null : work.media_url);
+    const isYoutube = work.media_type === "youtube";
+    const isPdf = work.media_type === "pdf";
+    const thumb = work.thumbnail_url || (isVideo || isYoutube || isPdf ? null : work.media_url);
 
-    const preview = isVideo
-      ? thumb
+    let preview;
+    if (isYoutube) {
+      preview = thumb
         ? `<img src="${escapeHtml(thumb)}" alt="" class="admin-work-thumb">`
-        : `<div class="admin-work-thumb admin-work-thumb-video"><i class="bi bi-play-circle"></i></div>`
-      : `<img src="${escapeHtml(work.media_url)}" alt="" class="admin-work-thumb">`;
+        : `<div class="admin-work-thumb admin-work-thumb-video"><i class="bi bi-youtube"></i></div>`;
+    } else if (isVideo) {
+      preview = thumb
+        ? `<img src="${escapeHtml(thumb)}" alt="" class="admin-work-thumb">`
+        : `<div class="admin-work-thumb admin-work-thumb-video"><i class="bi bi-play-circle"></i></div>`;
+    } else if (isPdf) {
+      preview = `<div class="admin-work-thumb admin-work-thumb-video"><i class="bi bi-file-earmark-pdf"></i></div>`;
+    } else {
+      preview = `<img src="${escapeHtml(work.media_url)}" alt="" class="admin-work-thumb">`;
+    }
 
     return `
       <div class="admin-work-item glass-card" data-id="${work.id}">
         ${preview}
         <div class="admin-work-info flex-grow-1">
           <h3 class="h6 mb-1">${escapeHtml(work.title)}</h3>
-          <p class="text-muted small mb-0">${escapeHtml(label)} · ${isVideo ? "Video" : "Image"}</p>
+          <p class="text-muted small mb-0">${escapeHtml(label)} · ${mediaTypeLabel(work.media_type)}</p>
         </div>
         <button type="button" class="btn btn-outline-danger btn-sm admin-delete-btn" data-id="${work.id}" aria-label="Delete ${escapeHtml(work.title)}">
           <i class="bi bi-trash"></i>
@@ -334,7 +534,7 @@
         return;
       }
       if (avatarFile.size > MAX_AVATAR_SIZE) {
-        showToast("Client photo must be under 5 MB.", "error");
+        showToast(`Client photo must be under ${formatMb(MAX_AVATAR_SIZE)}.`, "error");
         return;
       }
     }
@@ -357,7 +557,7 @@
 
       if (uploadError) {
         setLoading(btn, false);
-        showToast(uploadError.message, "error");
+        showToast(describeUploadError(uploadError, MAX_AVATAR_SIZE), "error");
         return;
       }
 
@@ -478,6 +678,7 @@
 
   function init() {
     populateCategorySelect();
+    syncMediaSourceFields();
 
     document.getElementById("loginForm")?.addEventListener("submit", handleLogin);
     document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
@@ -485,6 +686,10 @@
     document
       .getElementById("testimonialForm")
       ?.addEventListener("submit", handleTestimonialSubmit);
+
+    document.querySelectorAll('input[name="mediaSource"]').forEach((input) => {
+      input.addEventListener("change", syncMediaSourceFields);
+    });
 
     checkSession();
 

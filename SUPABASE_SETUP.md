@@ -39,13 +39,17 @@ window.SUPABASE_CONFIG = {
 
 1. Open `admin.html` in your browser.
 2. Sign in with your admin account.
-3. Upload images or videos and pick a category:
+3. Choose a media source:
+   - **File upload** — images, flyers/PDFs, or videos hosted in Supabase Storage
+   - **YouTube link** — paste a watch, share, Shorts, or embed URL (no file size limit)
+4. Pick a category:
    - **Video Production** — shows under Video Editing service
    - **Video Editing** — shows under Video Editing service
    - **Social Media** — shows under Social Media Management service
    - **Content Strategy** — shows under Content Strategy service
+   - **Graphics & Flyers** — shows under Graphics & Flyers service
 
-Works appear on the main site portfolio grid. Clicking a service card filters the grid by category.
+Works appear on the main site portfolio grid. Clicking a card opens the image/flyer, plays the uploaded video, embeds YouTube, or previews a PDF. Service cards filter the grid by category.
 
 ## Categories & filtering
 
@@ -55,6 +59,7 @@ Works appear on the main site portfolio grid. Clicking a service card filters th
 | Video Editing      | Video Editing                |
 | Social Media       | Social Media Management      |
 | Content Strategy   | Content Strategy             |
+| Graphics & Flyers  | Graphics & Flyers            |
 
 ## 6. Add testimonials
 
@@ -62,12 +67,39 @@ In `admin.html`, scroll to **Add testimonial** and enter the quote, client name,
 
 When there is more than one, the site rotates through them and shows dot navigation. Clients without a photo get their initials on a purple tile.
 
-## File limits
+## File limits (free plan)
 
-- Works: **100 MB** per file — JPG, PNG, WebP, GIF, MP4, WebM, MOV
-- Testimonial photos: **5 MB** per image
+| Limit | Free plan |
+|-------|-----------|
+| Max file upload | **50 MB** |
+| Total storage | **1 GB** |
+| Monthly bandwidth | 5 GB cached + 5 GB uncached |
 
-To increase limits, adjust Supabase Storage settings in your project dashboard.
+The admin panel enforces 50 MB for works and 5 MB for testimonial photos. Supported formats: JPG, PNG, WebP, GIF, SVG, BMP, TIFF, AVIF, HEIC, PDF, MP4, WebM, MOV. YouTube links bypass the upload limit entirely.
+
+Check **Storage Settings** in your dashboard and make sure *Global file size limit* is set to 50 MB, otherwise a lower default may reject valid uploads.
+
+### Keeping videos under 50 MB
+
+Roughly 1–2 minutes of 1080p footage fits in 50 MB at a sensible bitrate. To compress before uploading:
+
+- **HandBrake** (free) — use the *Fast 1080p30* preset, or *Fast 720p30* for longer clips
+- **FFmpeg** — `ffmpeg -i input.mp4 -vcodec libx264 -crf 28 -preset medium output.mp4` (raise `-crf` for smaller files)
+- **CloudConvert** or similar web tools for one-off files
+
+For reels and social clips, 720p is usually plenty since they display in a grid card.
+
+### If you outgrow the free plan
+
+Upgrading to Pro raises the per-file limit to 500 GB and includes 100 GB of storage. For longer videos, use **YouTube link** in the admin panel instead of uploading the file.
+
+## Existing projects: enable YouTube & graphics works
+
+If you already ran an older `schema.sql`, re-run the updated file in the SQL Editor (safe to re-run). It:
+
+- Widens `media_type` to include `youtube` and `pdf`
+- Adds the `graphics` category for flyers and design work
+- Makes `storage_path` nullable for link-only rows
 
 ## 7. Deploy on GitHub Pages
 

@@ -15,16 +15,36 @@ create table if not exists public.works (
       'video-production',
       'social-media',
       'video-editing',
-      'content-strategy'
+      'content-strategy',
+      'graphics'
     )
   ),
-  media_type text not null check (media_type in ('image', 'video')),
+  media_type text not null check (media_type in ('image', 'video', 'youtube', 'pdf')),
   media_url text not null,
-  storage_path text not null,
+  storage_path text,
   thumbnail_url text,
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- Safe upgrades for projects that already ran an older schema
+alter table public.works drop constraint if exists works_media_type_check;
+alter table public.works
+  add constraint works_media_type_check
+  check (media_type in ('image', 'video', 'youtube', 'pdf'));
+alter table public.works drop constraint if exists works_category_check;
+alter table public.works
+  add constraint works_category_check
+  check (
+    category in (
+      'video-production',
+      'social-media',
+      'video-editing',
+      'content-strategy',
+      'graphics'
+    )
+  );
+alter table public.works alter column storage_path drop not null;
 
 create index if not exists works_category_idx on public.works (category);
 create index if not exists works_sort_idx on public.works (sort_order desc, created_at desc);

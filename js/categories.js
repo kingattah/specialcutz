@@ -18,6 +18,10 @@
       label: "Content Strategy",
       services: ["content-strategy"],
     },
+    graphics: {
+      label: "Graphics & Flyers",
+      services: ["graphics"],
+    },
   };
 
   const SERVICE_FILTERS = {
@@ -25,6 +29,7 @@
     "video-editing": ["video-production", "video-editing"],
     "social-media": ["social-media"],
     "content-strategy": ["content-strategy"],
+    graphics: ["graphics"],
   };
 
   window.PortfolioCategories = {
@@ -48,6 +53,7 @@
         { value: "video-editing", label: "Video Editing" },
         { value: "social-media", label: "Social Media" },
         { value: "content-strategy", label: "Content Strategy" },
+        { value: "graphics", label: "Graphics & Flyers" },
       ];
     },
 
